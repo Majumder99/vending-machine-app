@@ -10,6 +10,7 @@
     "compile": "solcjs --abi --include-path node_modules/ --base-path . blockchain/contract/VendingMachine.sol --output-dir blockchain/build"
   },
   "dependencies": {
+    "bulma": "^0.9.4",
     "next": "13.0.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",

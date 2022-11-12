@@ -14,6 +14,11 @@ import vmContract from "../blockchain/vending";
 const vendingMachine = () => {
   const [err, setErr] = useState("");
   const [inventory, setInventory] = useState(0);
+  const [myDonuts, setMyDonuts] = useState(0);
+  const [buyCount, setBuyCount] = useState(0);
+  const [web3, setWeb3] = useState(null);
+  const [account, setAccount] = useState(null);
+
   useEffect(() => {
     getInventoryHandler();
   }, []);
@@ -21,17 +26,41 @@ const vendingMachine = () => {
   //to read from contract we use call
   //to write in contract we use send
   const getInventoryHandler = async () => {
-    const inv = await vmContract.methods.getVendingMachine().call();
+    const inv = await vmContract.methods.getVendingMachineBalance().call();
     setInventory(inv);
     console.log(inv);
   };
+
+  const getMydonutConuntHandler = async () => {
+    // console.log(web3);
+    const count = await vmContract.methods.donutBalances(accounts[0]).call();
+    setMyDonuts(count);
+  };
+
+  const buyDonuts = async () => {
+    await vmContract.methods.purchase().send({
+      from: account,
+    });
+  };
+
   const connectWalletHandler = async () => {
     // alert("connect wallet");
     if (typeof window !== undefined && typeof window.ethereum !== undefined) {
       try {
         //connect to metamask
+        //request wallet access
         window.ethereum.request({ method: "eth_requestAccounts" });
+        //creating web3 instance
         const web3 = new Web3(window.ethereum);
+        setWeb3(web3);
+        //get a list of accounts
+        const accounts = await web3.eth.getAccounts();
+        console.log(accounts);
+        setAccount(accounts[0]);
+
+        //create local contract copy
+
+        getMydonutConuntHandler();
         console.log(web3);
       } catch (error) {
         console.log(error.message);
@@ -71,7 +100,28 @@ const vendingMachine = () => {
         </div>
         <div>
           <div className="container">
-            <h2>Total inventory : {inventory}</h2>
+            <h2>My donuts : {myDonuts}</h2>
+          </div>
+        </div>
+        <div className="mt-5">
+          <div className="container">
+            <div className="field">
+              <label htmlFor="" className="label">
+                Buy donut
+              </label>
+              <div className="control">
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Enter amount..."
+                  value={buyCount}
+                  onChange={(e) => setBuyCount(e.target.value)}
+                />
+              </div>
+              <button onClick={buyDonuts} className="button is-primary mt-5">
+                Buy
+              </button>
+            </div>
           </div>
         </div>
         <div className="container">

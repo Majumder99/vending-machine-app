@@ -5,3 +5,6 @@ to compile the contract locally we need a library called solc.
 it will compile and give us the abi
 
 abi is tha passport between js and blockchain
+
+
+we need to get all the accounts using web3, we need to conenct eth using web3.
