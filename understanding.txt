@@ -1,0 +1,7 @@
+if we don't use ganache then we will use infura to connect the testnet. in ganache we already have testnet
+meaning the local blokchain. i hope that makes sense.
+
+to compile the contract locally we need a library called solc. 
+it will compile and give us the abi
+
+abi is tha passport between js and blockchain
