@@ -4,7 +4,7 @@ import "bulma/css/bulma.css";
 import Head from "next/head";
 import Web3 from "web3";
 import { useState, useEffect } from "react";
-import vmContract from "../blockchain/vending";
+import vendingMachineContract from "../blockchain/vending";
 // m,dKK@;fl99
 
 //metamask api provides ethereum provider api. global object, injected in window
@@ -18,10 +18,17 @@ const vendingMachine = () => {
   const [buyCount, setBuyCount] = useState(0);
   const [web3, setWeb3] = useState(null);
   const [account, setAccount] = useState(null);
+  const [vmContract, setVmContract] = useState(null);
+  const [purchases, setPurchases] = useState(0);
 
   useEffect(() => {
-    getInventoryHandler();
-  }, []);
+    if (vmContract) {
+      getInventoryHandler();
+    }
+    if (vmContract && account) {
+      getMydonutConuntHandler();
+    }
+  }, [vmContract, account, purchases]);
 
   //to read from contract we use call
   //to write in contract we use send
@@ -33,14 +40,25 @@ const vendingMachine = () => {
 
   const getMydonutConuntHandler = async () => {
     // console.log(web3);
-    const count = await vmContract.methods.donutBalances(accounts[0]).call();
+    const count = await vmContract.methods.donutBalances(account).call();
     setMyDonuts(count);
   };
 
   const buyDonuts = async () => {
-    await vmContract.methods.purchase().send({
-      from: account,
-    });
+    // console.log(buyCount);
+    try {
+      //GoerliETH
+      console.log("before vmcontract");
+      await vmContract.methods.purchase(buyCount).send({
+        from: account,
+        value: web3.utils.toWei("0.0000001", "ether") * buyCount,
+      });
+      setPurchases((c) => c + 1);
+      // console.log(web3.utils.toWei("1", "ether") * buyCount);
+      console.log("after vmcontract");
+    } catch (error) {
+      setErr(error.message);
+    }
   };
 
   const connectWalletHandler = async () => {
@@ -59,9 +77,10 @@ const vendingMachine = () => {
         setAccount(accounts[0]);
 
         //create local contract copy
-
-        getMydonutConuntHandler();
-        console.log(web3);
+        const vm = vendingMachineContract(web3);
+        setVmContract(vm);
+        // getMydonutConuntHandler();
+        console.log({ web3, vm });
       } catch (error) {
         console.log(error.message);
         setErr(error.message);

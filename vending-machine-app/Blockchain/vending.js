@@ -1,9 +1,3 @@
-import Web3 from "web3";
-
-const web3 = new Web3(
-  "https://goerli.infura.io/v3/8f1ccefc9ed149919ca0ccebd9807acf"
-);
-
 //we are going export the copy of smart contract to the js files
 const abi = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
@@ -43,10 +37,11 @@ const abi = [
     type: "function",
   },
 ];
+const vendingMachineContract = (web3) => {
+  return new web3.eth.Contract(
+    abi,
+    "0x0B5EfE6186931f41E9BA9D7D44a7E786dcb880F3"
+  );
+};
 
-const vmContract = new web3.eth.Contract(
-  abi,
-  "0x7e926eCc80103D9D58C51efC796D873d9575d5EF"
-);
-
-export default vmContract;
+export default vendingMachineContract;
